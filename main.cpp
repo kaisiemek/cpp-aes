@@ -1,12 +1,12 @@
 #include <array>
 #include <bit>
 
-#include "AES128Encryptor.h"
-
-using namespace std;
+#include "AES128.h"
+#include "Constructs/StateMatrix.h"
 
 int main()
 {
+  using std::array, std::bit_cast, std::cout;
   // From NIST test vector ECBKeySbox128.rsp Count 0
   std::array<uint8_t, 16> input_data {};
   std::array<uint8_t , 16> key_data {
@@ -18,8 +18,9 @@ int main()
 
   AES::Key128 key {std::bit_cast<AES::block>(key_data)};
 
-  AES::AES128Encryptor enc {input_data, key};
-  enc.encrypt();
+  AES::AES128 aes {input_data, key};
+  aes.encrypt();
+  aes.decrypt();
 
   return 0;
 }

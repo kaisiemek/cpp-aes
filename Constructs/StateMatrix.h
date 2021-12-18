@@ -23,6 +23,11 @@ namespace AES {
     void substitute();
     void shift_rows();
     void mix_columns();
+
+    void inverse_substitute();
+    void inverse_shift_rows();
+    void inverse_mix_columns();
+
     [[nodiscard]] std::array<std::byte, 16> get_data() const;
 
     [[nodiscard]] std::string to_string() const;

@@ -35,6 +35,8 @@ void StateMatrix::add_key(Key128 key)
   m_data = bit_cast<block_matrix>(tmp);
 }
 
+// ENCRYPTION STEPS
+
 void StateMatrix::substitute()
 {
   for (auto& col : m_data) {
@@ -84,6 +86,64 @@ void StateMatrix::mix_columns()
       m_data[col][row] = byte{0};
       for (size_t entry {0}; entry < 4; ++entry) {
         m_data[col][row] ^= gf_256_mult(mc[entry][row], tmp[col][entry]);
+      }
+    }
+  }
+}
+
+// DECRYPTION STEPS
+
+void StateMatrix::inverse_substitute()
+{
+  for (auto& col : m_data) {
+    for (auto& cell : col) {
+      cell = inverse_s_box[static_cast<uint8_t>(cell)];
+    }
+  }
+}
+
+void StateMatrix::inverse_shift_rows()
+{
+  using std::array;
+  // First row is not shifted, second by one bytes to the right, etc.
+  // Cyclic shift, so the shifts in shift_rows + inverse_shift_rows add up to 0 mod 4
+  static constexpr array<size_t, 4> shifts {0, 1, 2, 3};
+
+  auto tmp = m_data;
+
+  for (size_t row {0}; row < m_data.size(); ++row) {
+    for (size_t col {0}; col < m_data[row].size(); ++col) {
+      // Add shifts[row] to the column index, wrap around at 4
+      m_data[(col + shifts[row]) % m_data.size()][row] = tmp[col][row];
+    }
+  }
+}
+
+void StateMatrix::inverse_mix_columns()
+{
+  using std::array, std::bit_cast, std::byte;
+
+  // Matrix with which the state matrix is multiplied in GF256
+  // Inverse matrix of the matrix in mix_columns()
+  static constexpr auto inverse_mc = bit_cast<block_matrix>(array<array<uint8_t, 4>, 4>
+    {{
+       {0x0E, 0x09, 0x0D, 0x0B},
+       {0x0B, 0x0E, 0x09, 0x0D},
+       {0x0D, 0x0B, 0x0E, 0x09},
+       {0x09, 0x0D, 0x0B, 0x0E},
+     }}
+  );
+
+  auto tmp = m_data;
+
+  // Kind of messy matrix multiplication in GF256
+  // please refer to https://en.wikipedia.org/wiki/Rijndael_MixColumns
+  // and https://www.samiam.org/galois.html for the GF256 math.
+  for (size_t col {0}; col < 4; ++col) {
+    for (size_t row {0}; row < 4; ++row) {
+      m_data[col][row] = byte{0};
+      for (size_t entry {0}; entry < 4; ++entry) {
+        m_data[col][row] ^= gf_256_mult(inverse_mc[entry][row], tmp[col][entry]);
       }
     }
   }
