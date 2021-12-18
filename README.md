@@ -3,7 +3,7 @@
 A purely educational (NOT SECURE!) implementation of AES, favouring code readability over performance. 
 This is a WIP.
 
-STATE: Basic Encryption for a single block implemented. No decryption, no block cypher modes for arbitrary lengths of data yet. Only AES128 as of now, AES196 and AES256 will follow as soon as AES128 is completely implemented.
+STATE: Basic encryption and decryption for a single block implemented. No block cypher modes for arbitrary lengths of data yet. Only AES128 as of now, AES196 and AES256 will follow as soon as AES128 is completely implemented.
 
 Sources used:
 - Understanding Cryptography by Christof Paar https://link.springer.com/book/10.1007/978-3-642-04101-3 (Book)
