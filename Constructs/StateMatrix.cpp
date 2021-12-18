@@ -19,7 +19,7 @@ StateMatrix::StateMatrix(block block_data)
 : m_data {std::bit_cast<block_matrix>(block_data)}
 { }
 
-void StateMatrix::add_key(Key128 key)
+void StateMatrix::add_round_key(Key128 key)
 {
   using std::array, std::byte, std::bit_cast;
 
@@ -37,7 +37,7 @@ void StateMatrix::add_key(Key128 key)
 
 // ENCRYPTION STEPS
 
-void StateMatrix::substitute()
+void StateMatrix::sub_bytes()
 {
   for (auto& col : m_data) {
     for (auto& cell : col) {
@@ -93,7 +93,7 @@ void StateMatrix::mix_columns()
 
 // DECRYPTION STEPS
 
-void StateMatrix::inverse_substitute()
+void StateMatrix::inv_sub_bytes()
 {
   for (auto& col : m_data) {
     for (auto& cell : col) {
@@ -102,11 +102,11 @@ void StateMatrix::inverse_substitute()
   }
 }
 
-void StateMatrix::inverse_shift_rows()
+void StateMatrix::inv_shift_rows()
 {
   using std::array;
   // First row is not shifted, second by one bytes to the right, etc.
-  // Cyclic shift, so the shifts in shift_rows + inverse_shift_rows add up to 0 mod 4
+  // Cyclic shift, so the shifts in shift_rows + inv_shift_rows add up to 0 mod 4
   static constexpr array<size_t, 4> shifts {0, 1, 2, 3};
 
   auto tmp = m_data;
@@ -119,7 +119,7 @@ void StateMatrix::inverse_shift_rows()
   }
 }
 
-void StateMatrix::inverse_mix_columns()
+void StateMatrix::inv_mix_columns()
 {
   using std::array, std::bit_cast, std::byte;
 

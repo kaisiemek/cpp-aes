@@ -19,14 +19,14 @@ namespace AES {
 
   public:
     explicit StateMatrix(std::array<std::byte, 16> block_data);
-    void add_key(AES::Key128 key);
-    void substitute();
+    void add_round_key(AES::Key128 key);
+    void sub_bytes();
     void shift_rows();
     void mix_columns();
 
-    void inverse_substitute();
-    void inverse_shift_rows();
-    void inverse_mix_columns();
+    void inv_sub_bytes();
+    void inv_shift_rows();
+    void inv_mix_columns();
 
     [[nodiscard]] std::array<std::byte, 16> get_data() const;
 

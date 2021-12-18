@@ -112,7 +112,7 @@ word Key128::g_function(word data, int round)
   word result {};
 
   // Compare "Understanding Cryptography" (Christof Paar) Figure 4.5
-  // Shift bytes left by one, substitute bytes with sboxes,
+  // Shift bytes left by one, sub_bytes bytes with sboxes,
   for (size_t i {0}; i < result.size(); ++i) {
     result[i] = s_box[static_cast<uint8_t>(data[(i + 1) % result.size()])];
 

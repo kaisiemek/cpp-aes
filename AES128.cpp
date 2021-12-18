@@ -31,12 +31,12 @@ namespace AES
       // One initial key addition before the actual encryption rounds
       if (i == 0)
       {
-        m_state.add_key(key_schedule.front());
+        m_state.add_round_key(key_schedule.front());
         key_schedule.pop();
         continue;
       }
 
-      m_state.substitute();
+      m_state.sub_bytes();
       m_state.shift_rows();
 
       // Do not perform the mix columns step in the last round
@@ -45,7 +45,7 @@ namespace AES
         m_state.mix_columns();
       }
 
-      m_state.add_key(key_schedule.front());
+      m_state.add_round_key(key_schedule.front());
       key_schedule.pop();
     }
 
@@ -67,7 +67,7 @@ namespace AES
 
     for (int i {0}; i <= AES128_ENCRYPTION_ROUNDS; ++i)
     {
-      m_state.add_key(key_schedule.top());
+      m_state.add_round_key(key_schedule.top());
       key_schedule.pop();
 
       // After the last round do one last key addition but nothing else
@@ -78,11 +78,11 @@ namespace AES
 
       // Do not perform the mix columns step in the first round
       if (i != 0) {
-        m_state.inverse_mix_columns();
+        m_state.inv_mix_columns();
       }
 
-      m_state.inverse_shift_rows();
-      m_state.inverse_substitute();
+      m_state.inv_shift_rows();
+      m_state.inv_sub_bytes();
     }
 
     cout << "PLAINTEXT:\n\t";
