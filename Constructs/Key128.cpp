@@ -62,6 +62,20 @@ std::queue<Key128> Key128::get_enc_key_schedule(Key128 initial_key)
   return schedule;
 }
 
+std::stack<Key128> Key128::get_dec_key_schedule(Key128 initial_key)
+{
+  std::stack<Key128> schedule {};
+  auto current_key = initial_key;
+
+  // <= intended, need one more key (0-th round, initial key addition)
+  for (int round{0}; round <= AES128_ENCRYPTION_ROUNDS; ++round) {
+    current_key = current_key.next_key(round);
+    schedule.push(current_key);
+  }
+
+  return schedule;
+}
+
 // STRING/PRINT OPS
 
 std::string Key128::to_str() const
@@ -78,12 +92,6 @@ std::string Key128::to_str() const
   auto result_str = key_str.str();
   result_str.pop_back(); // Remove excess space
   return result_str;
-}
-
-std::ostream& operator<<(std::ostream& os, const Key128& key)
-{
-  os << key.to_str();
-  return os;
 }
 
 // PRIVATE

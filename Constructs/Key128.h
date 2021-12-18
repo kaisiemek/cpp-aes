@@ -8,6 +8,7 @@
 #include <array>
 #include <string>
 #include <queue>
+#include <stack>
 
 #include "../Util.h"
 
@@ -25,6 +26,7 @@ namespace AES {
     [[nodiscard]] std::string to_str() const;
 
     static std::queue<Key128> get_enc_key_schedule(Key128 key);
+    static std::stack<Key128> get_dec_key_schedule(Key128 key);
   private:
     static word g_function(word data, int round);
   };

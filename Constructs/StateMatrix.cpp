@@ -108,9 +108,3 @@ std::string StateMatrix::to_string() const
 
   return mat_str.str();
 }
-
-std::ostream& operator<<(std::ostream& os, const StateMatrix& mat)
-{
-  os << mat.to_string();
-  return os;
-}
