@@ -49,7 +49,7 @@ namespace AES
       key_schedule.pop();
     }
 
-    cout << "CYPHERTEXT:\n\t";
+    cout << "CIPHERTEXT:\n\t";
     cout << block_to_string(m_state.get_data()) << '\n';
 
     // Cast back to uint8_t array.
@@ -59,7 +59,7 @@ namespace AES
   std::array<uint8_t, 16> AES128::decrypt()
   {
     using std::array, std::bit_cast, std::cout;
-    cout << "CYPHERTEXT:\n\t";
+    cout << "CIPHERTEXT:\n\t";
     cout << block_to_string(m_state.get_data()) << '\n';
     cout << "KEY:\n\t" << m_key.to_str() << '\n';
 
