@@ -8,12 +8,13 @@ While SHA256 might not be the most conventional choice to generate AES Keys, it 
 used hashing algorithms and given the educational nature of this little project I thought it was a fine choice.
 
 > **Current State**
-- Basic Encryption/Decryption of a single 128 Bit (16 Byte) Block
+- Basic Encryption/Decryption of a arbitrary length data (not cleaned up and improved yet)
 - SHA256 Hashing of arbitrary bytes, only prototype not cleaned up yet
+- Input via command line, prototype
 - Not implemented:
   - Variable key length (only AES128 at this point in time)
   - No input/output capabilities, encrypted data and keys are hardcoded arrays
-  - No block modes yet (ECB, CBC, OFB, etc.)
+  - No block modes yet (Stuck in simple ECB mode so far)
 
 > **Sources used**
 - The NIST AES specification: 
