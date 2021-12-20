@@ -10,24 +10,23 @@
 #include <queue>
 #include <stack>
 
-#include "../Util.h"
+#include "../DataTypes.h"
 
 namespace AES {
   class Key128
   {
   private:
+    static constexpr int SCHEDULE_KEY_NUM {11};
     block m_data;
   public:
     Key128() = default;
     explicit Key128(block data) : m_data(data) {};
     [[nodiscard]] const block& get_bytes() const;
-    [[nodiscard]] Key128 next_key(int round) const;
-
     [[nodiscard]] std::string to_str() const;
 
-    static std::queue<Key128> get_enc_key_schedule(Key128 key);
-    static std::stack<Key128> get_dec_key_schedule(Key128 key);
+    static std::deque<Key128> generate_key_schedule(Key128 initial_key);
   private:
+    [[nodiscard]] Key128 next_key(int round) const;
     static word g_function(word data, int round);
   };
 

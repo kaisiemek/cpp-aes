@@ -10,15 +10,16 @@
 #include <iostream>
 
 #include "Key128.h"
+#include "../DataTypes.h"
 
 namespace AES {
   class StateMatrix
   {
   private:
-    std::array<std::array<std::byte, 4>, 4> m_data;
+    AES::matrix m_data;
 
   public:
-    explicit StateMatrix(std::array<std::byte, 16> block_data);
+    explicit StateMatrix(block block_data);
     void add_round_key(AES::Key128 key);
     void sub_bytes();
     void shift_rows();
@@ -28,8 +29,7 @@ namespace AES {
     void inv_shift_rows();
     void inv_mix_columns();
 
-    [[nodiscard]] std::array<std::byte, 16> get_data() const;
-
+    [[nodiscard]] block get_data() const;
     [[nodiscard]] std::string to_string() const;
   };
 }

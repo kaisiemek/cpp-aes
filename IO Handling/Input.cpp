@@ -7,7 +7,7 @@
 #include <cstring>
 #include <iomanip>
 #include "../SHA256/SHA256.h"
-#include "../AES128.h"
+#include "../AES128/AES128.h"
 
 using namespace AES;
 

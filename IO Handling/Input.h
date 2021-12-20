@@ -5,7 +5,7 @@
 #ifndef AES_CPP_INPUT_H
 #define AES_CPP_INPUT_H
 
-#include "../Constructs/Key128.h"
+#include "../AES128/Constructs/Key128.h"
 
 namespace AES {
   Key128 generate_key(const std::string& input);

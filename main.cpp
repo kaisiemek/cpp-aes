@@ -1,7 +1,7 @@
 #include <array>
 #include <iomanip>
 
-#include "AES128.h"
+#include "AES128/AES128.h"
 #include "SHA256/SHA256.h"
 #include "IO Handling/Input.h"
 #include "includes/argparse.hpp"
@@ -24,5 +24,6 @@ int main(int argc, char** argv)
   } else {
     AES::interactive_mode();
   }
+
   return 0;
 }

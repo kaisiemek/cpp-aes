@@ -8,40 +8,41 @@
 #include <iomanip>
 #include <sstream>
 #include <bit>
-#include <cstddef>
 
-#include "../Util.h"
 #include "../Constants.h"
 
 using namespace AES;
 
 StateMatrix::StateMatrix(block block_data)
-: m_data {std::bit_cast<block_matrix>(block_data)}
+: m_data {std::bit_cast<matrix>(block_data)}
 { }
+
+block StateMatrix::get_data() const
+{
+  return std::bit_cast<block>(m_data);
+}
 
 void StateMatrix::add_round_key(Key128 key)
 {
-  using std::array, std::byte, std::bit_cast;
+  using std::array, std::bit_cast;
 
   // Copy the matrix data into a flat array
   auto byte_cpy = bit_cast<block>(m_data);
   auto key_data = key.get_bytes();
 
   // XOR each key and data byte, assign it to result
-  block tmp{};
-  std::transform(byte_cpy.begin(), byte_cpy.end(), key_data.begin(), tmp.begin(), std::bit_xor{});
+  std::transform(byte_cpy.begin(), byte_cpy.end(), key_data.begin(), byte_cpy.begin(), std::bit_xor{});
 
   // Re-package the flat array as matrix
-  m_data = bit_cast<block_matrix>(tmp);
+  m_data = bit_cast<matrix>(byte_cpy);
 }
 
 // ENCRYPTION STEPS
-
 void StateMatrix::sub_bytes()
 {
   for (auto& col : m_data) {
     for (auto& cell : col) {
-      cell = s_box[static_cast<uint8_t>(cell)];
+      cell = s_box[cell];
     }
   }
 }
@@ -64,17 +65,17 @@ void StateMatrix::shift_rows()
 
 void StateMatrix::mix_columns()
 {
-  using std::array, std::bit_cast, std::byte;
+  using std::array, std::bit_cast;
 
   // Matrix with which the state matrix is multiplied in GF256
-  static constexpr auto mc = bit_cast<block_matrix>(array<array<uint8_t, 4>, 4>
-    {{
+  static constexpr matrix mc{
+    {
        {2, 1, 1, 3},
        {3, 2, 1, 1},
        {1, 3, 2, 1},
        {1, 1, 3, 2},
-     }}
-  );
+     }
+  };
 
   auto tmp = m_data;
 
@@ -83,7 +84,7 @@ void StateMatrix::mix_columns()
   // and https://www.samiam.org/galois.html for the GF256 math.
   for (size_t col {0}; col < 4; ++col) {
     for (size_t row {0}; row < 4; ++row) {
-      m_data[col][row] = byte{0};
+      m_data[col][row] = 0x00;
       for (size_t entry {0}; entry < 4; ++entry) {
         m_data[col][row] ^= gf_256_mult(mc[entry][row], tmp[col][entry]);
       }
@@ -92,12 +93,11 @@ void StateMatrix::mix_columns()
 }
 
 // DECRYPTION STEPS
-
 void StateMatrix::inv_sub_bytes()
 {
   for (auto& col : m_data) {
     for (auto& cell : col) {
-      cell = inverse_s_box[static_cast<uint8_t>(cell)];
+      cell = inverse_s_box[cell];
     }
   }
 }
@@ -121,18 +121,18 @@ void StateMatrix::inv_shift_rows()
 
 void StateMatrix::inv_mix_columns()
 {
-  using std::array, std::bit_cast, std::byte;
+  using std::array, std::bit_cast;
 
   // Matrix with which the state matrix is multiplied in GF256
   // Inverse matrix of the matrix in mix_columns()
-  static constexpr auto inverse_mc = bit_cast<block_matrix>(array<array<uint8_t, 4>, 4>
-    {{
-       {0x0E, 0x09, 0x0D, 0x0B},
-       {0x0B, 0x0E, 0x09, 0x0D},
-       {0x0D, 0x0B, 0x0E, 0x09},
-       {0x09, 0x0D, 0x0B, 0x0E},
-     }}
-  );
+  static constexpr matrix inverse_mc {
+    {
+      {0x0E, 0x09, 0x0D, 0x0B},
+      {0x0B, 0x0E, 0x09, 0x0D},
+      {0x0D, 0x0B, 0x0E, 0x09},
+      {0x09, 0x0D, 0x0B, 0x0E},
+    }
+  };
 
   auto tmp = m_data;
 
@@ -149,11 +149,7 @@ void StateMatrix::inv_mix_columns()
   }
 }
 
-block StateMatrix::get_data() const
-{
-  return std::bit_cast<block>(m_data);
-}
-
+// STRING/PRINT OPS
 std::string StateMatrix::to_string() const
 {
   std::stringstream mat_str;
