@@ -10,7 +10,6 @@
 #include <bit>
 #include <string>
 #include <optional>
-//#include <cstddef>
 
 namespace SHA {
   // ========= Data Types =========

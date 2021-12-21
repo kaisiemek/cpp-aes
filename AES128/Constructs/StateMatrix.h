@@ -9,7 +9,6 @@
 #include <string>
 #include <iostream>
 
-#include "Key128.h"
 #include "../DataTypes.h"
 
 namespace AES {
@@ -20,7 +19,7 @@ namespace AES {
 
   public:
     explicit StateMatrix(block block_data);
-    void add_round_key(AES::Key128 key);
+    void add_round_key(const round_key &key);
     void sub_bytes();
     void shift_rows();
     void mix_columns();

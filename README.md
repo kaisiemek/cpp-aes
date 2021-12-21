@@ -12,7 +12,7 @@ used hashing algorithms and given the educational nature of this little project 
 - SHA256 Hashing of arbitrary bytes, only prototype not cleaned up yet
 - Input via command line, prototype
 - Not implemented:
-  - Variable key length (only AES128 at this point in time)
+  - Variable key length (only AES at this point in time)
   - No input/output capabilities, encrypted data and keys are hardcoded arrays
   - No block modes yet (Stuck in simple ECB mode so far)
 

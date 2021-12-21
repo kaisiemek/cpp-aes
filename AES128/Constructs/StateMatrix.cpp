@@ -22,16 +22,15 @@ block StateMatrix::get_data() const
   return std::bit_cast<block>(m_data);
 }
 
-void StateMatrix::add_round_key(Key128 key)
+void StateMatrix::add_round_key(const round_key &key)
 {
   using std::array, std::bit_cast;
 
   // Copy the matrix data into a flat array
   auto byte_cpy = bit_cast<block>(m_data);
-  auto key_data = key.get_bytes();
 
   // XOR each key and data byte, assign it to result
-  std::transform(byte_cpy.begin(), byte_cpy.end(), key_data.begin(), byte_cpy.begin(), std::bit_xor{});
+  std::transform(byte_cpy.begin(), byte_cpy.end(), key.begin(), byte_cpy.begin(), std::bit_xor{});
 
   // Re-package the flat array as matrix
   m_data = bit_cast<matrix>(byte_cpy);
