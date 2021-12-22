@@ -2,6 +2,8 @@
 
 #include "IO Handling/Input.h"
 #include "includes/argparse.hpp"
+#include "Base64/Base64.h"
+
 
 int main(int argc, char** argv)
 {
