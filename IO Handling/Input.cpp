@@ -4,12 +4,11 @@
 
 #include "Input.h"
 #include <iostream>
+#include <fstream>
 #include <cstring>
 #include <iomanip>
 #include "../SHA256/SHA256.h"
-#include "../AES128/AES.h"
-#include "../AES128/Constructs/Key.h"
-#include "../AES128/DataTypes.h"
+#include "../AES/AES.h"
 
 namespace AES
 {
@@ -65,7 +64,7 @@ namespace AES
     {
       vector<uint8_t> data{user_data.begin(), user_data.end()};
       AES aes{data, key};
-      auto res = aes.encrypt(false);
+      auto res = aes.encrypt(false, false);
       for (auto x: res)
       {
         std::cout << std::hex << std::setfill('0') << std::setw(2) << +x;
@@ -74,7 +73,7 @@ namespace AES
     } else if (response == "d")
     {
       vector<uint8_t> data{string_to_data(user_data)};
-      AES aes {data, key};
+      AES aes{data, key};
       auto res = aes.decrypt(false);
       string res_str{res.begin(), res.end()};
       std::cout << res_str << std::endl;
@@ -96,3 +95,65 @@ namespace AES
     return data;
   }
 }
+  void AES::encrypt_file(std::filesystem::path file_path, std::optional<std::filesystem::path> out_path,
+                         std::optional<std::string> password, bool encrypt, bool decrypt)
+  {
+  using namespace AES;
+    if (!std::filesystem::is_regular_file(file_path)) {
+      std::cerr << "'" << file_path << "' is not a regular file.\n";
+      std::exit(2);
+    }
+
+    std::filesystem::path ofp;
+    if (!out_path.has_value()) {
+      std::cout << "No outfile path is given, please enter a path:\n> ";
+//      std::getline(std::cin, ofp);
+      std::cin >> ofp;
+      std::cout << '\n';
+      std::filesystem::create_directories(ofp.parent_path());
+    } else {
+      ofp = out_path.value();
+    }
+
+    std::string pw1, pw2;
+    if (!password.has_value()) {
+      std::cout << "No password was given, please enter a password:\n> ";
+      std::cin >> pw1;
+      std::cout << "Repeat the password:\n> ";
+      std::cin >> pw2;
+
+      if (pw1 != pw2) {
+        std::cerr << "The passwords did not match up\n";
+        std::exit(2);
+      }
+    } else {
+      pw1 = password.value();
+    }
+
+    if (!encrypt && !decrypt) {
+      std::string answer;
+      std::cout << "No mode was specified, do you want to encrypt or decrypt (e/d)?\n> ";
+      std::cin >> answer;
+
+      if (answer == "e") {
+        encrypt = true;
+        decrypt = false;
+      } else if (answer == "d") {
+        encrypt = false;
+        decrypt = true;
+      } else {
+        std::cerr << "'" << answer << "' was not a valid option\n";
+        std::exit(2);
+      }
+    }
+
+    if (encrypt) {
+      Key key {pw1, KeySize::AES256};
+      AES aes {std::vector<byte>{}, key};
+      aes.encrypt_file({file_path, std::ios::binary}, {ofp, std::ios::binary});
+    } else {
+      Key key {pw1, KeySize::AES256};
+      AES aes {std::vector<byte>{}, key};
+      aes.decrypt_file({file_path, std::ios::binary | std::ios::ate}, {ofp});
+    }
+  }
